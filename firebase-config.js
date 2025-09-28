@@ -132,24 +132,3 @@ if (typeof module !== 'undefined' && module.exports) {
 
 ¡Listo! Tu Firebase estará configurado.
 */
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAs4D5LjiH60UEtwWO8F3w5Pj7tnyXOLso",
-  authDomain: "brunesecurity.firebaseapp.com",
-  projectId: "brunesecurity",
-  storageBucket: "brunesecurity.firebasestorage.app",
-  messagingSenderId: "1097289716993",
-  appId: "1:1097289716993:web:af4e0d0dcb8911782bf700",
-  measurementId: "G-GR3VP91CZ1"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-const analytics = getAnalytics(app);
