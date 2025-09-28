@@ -10,7 +10,7 @@
 // 5. Registra la app con nombre "BruneSecurity Web"
 // 6. Copia la configuración que aparece y reemplaza los valores abajo
 
-
+// CONFIGURACIÓN DE FIREBASE (REEMPLAZAR CON TUS DATOS)
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
@@ -33,19 +33,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
-/*CONFIGURACIÓN DE FIREBASE (REEMPLAZAR CON TUS DATOS)
-const firebaseConfig = {
-    apiKey: "TU_API_KEY_AQUI",
-    authDomain: "TU_PROJECT_ID.firebaseapp.com",
-    projectId: "TU_PROJECT_ID",
-    storageBucket: "TU_PROJECT_ID.appspot.com",
-    messagingSenderId: "TU_SENDER_ID",
-    appId: "TU_APP_ID"
-};
-
 // Hacer la configuración disponible globalmente
-//window.firebaseConfig = firebaseConfig;
-//
+window.firebaseConfig = firebaseConfig;
+
 // EJEMPLO DE CONFIGURACIÓN (NO USAR EN PRODUCCIÓN):
 /*
 const firebaseConfigExample = {
@@ -154,4 +144,5 @@ if (typeof module !== 'undefined' && module.exports) {
    - Guarda el archivo
 
 ¡Listo! Tu Firebase estará configurado.
+*/
 */
