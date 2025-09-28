@@ -458,7 +458,10 @@
         import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
         // Check if Firebase config is available
-        if (typeof window.firebaseConfig !== 'undefined' && window.firebaseConfig.apiKey !== "TU_API_KEY") {
+        if (typeof window.firebaseConfig !== 'undefined' && 
+            window.firebaseConfig.apiKey !== "TU_API_KEY" && 
+            window.firebaseConfig.apiKey !== "TU_API_KEY_AQUI" &&
+            !window.firebaseConfig.apiKey.startsWith("TU_")) {
             try {
                 // Initialize Firebase with user configuration
                 const app = initializeApp(window.firebaseConfig);
