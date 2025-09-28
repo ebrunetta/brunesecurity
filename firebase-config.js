@@ -20,6 +20,9 @@ const firebaseConfig = {
     appId: "TU_APP_ID"
 };
 
+// Hacer la configuración disponible globalmente
+window.firebaseConfig = firebaseConfig;
+
 // EJEMPLO DE CONFIGURACIÓN (NO USAR EN PRODUCCIÓN):
 /*
 const firebaseConfigExample = {
