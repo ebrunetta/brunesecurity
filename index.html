@@ -2,10 +2,29 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="BruneSecurity - Gestor de contraseñas seguro y moderno para móviles y escritorio">
+    <meta name="keywords" content="gestor contraseñas, seguridad, móvil, responsive">
+    <meta name="author" content="BruneSecurity">
+    
+    <!-- Optimizaciones para móviles -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="BruneSecurity">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="msapplication-TileColor" content="#6366f1">
+    
+    <!-- Prevenir zoom automático en iOS -->
+    <meta name="format-detection" content="telephone=no">
+    
     <title>BruneSecurity - Gestor de Contraseñas</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Preload para mejor rendimiento -->
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 </head>
 <body>
     <div class="app-container">
@@ -20,11 +39,14 @@
                     <h2>Iniciar Sesión</h2>
                     <div class="input-group">
                         <label for="login-email">Correo Electrónico</label>
-                        <input type="email" id="login-email" placeholder="Ingresa tu correo electrónico">
+                        <input type="email" id="login-email" placeholder="Ingresa tu correo electrónico" 
+                               autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false"
+                               inputmode="email">
                     </div>
                     <div class="input-group">
                         <label for="master-password">Contraseña Maestra</label>
-                        <input type="password" id="master-password" placeholder="Ingresa tu contraseña maestra">
+                        <input type="password" id="master-password" placeholder="Ingresa tu contraseña maestra"
+                               autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false">
                     </div>
                     <button id="login-button" class="primary-button">Iniciar Sesión Local</button>
                     <button id="login-firebase-button" class="secondary-button" style="margin-top: 10px;">
@@ -54,15 +76,19 @@
                     <h2>Crear Cuenta</h2>
                     <div class="input-group">
                         <label for="register-email">Correo Electrónico</label>
-                        <input type="email" id="register-email" placeholder="Ingresa tu correo electrónico">
+                        <input type="email" id="register-email" placeholder="Ingresa tu correo electrónico"
+                               autocomplete="email" autocapitalize="none" autocorrect="off" spellcheck="false"
+                               inputmode="email">
                     </div>
                     <div class="input-group">
                         <label for="register-password">Contraseña Maestra</label>
-                        <input type="password" id="register-password" placeholder="Crea tu contraseña maestra">
+                        <input type="password" id="register-password" placeholder="Crea tu contraseña maestra"
+                               autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false">
                     </div>
                     <div class="input-group">
                         <label for="confirm-password">Confirmar Contraseña</label>
-                        <input type="password" id="confirm-password" placeholder="Confirma tu contraseña maestra">
+                        <input type="password" id="confirm-password" placeholder="Confirma tu contraseña maestra"
+                               autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false">
                     </div>
                     <button id="register-button" class="primary-button">Crear Cuenta Local</button>
                     <button id="register-firebase-button" class="secondary-button" style="margin-top: 10px;">
@@ -91,7 +117,9 @@
                 </div>
                 <div class="search-bar">
                     <i class="fas fa-magnifying-glass"></i>
-                    <input type="text" id="search-input" placeholder="Buscar contraseñas...">
+                    <input type="search" id="search-input" placeholder="Buscar contraseñas..."
+                           autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"
+                           inputmode="search">
                 </div>
                 <button id="logout-button" class="icon-button">
                     <i class="fas fa-arrow-right-from-bracket"></i>
@@ -366,16 +394,20 @@
             <div class="add-password-form">
                 <div class="input-group">
                     <label for="password-title">Título</label>
-                    <input type="text" id="password-title" placeholder="Ej. Facebook, Gmail, Banco">
+                    <input type="text" id="password-title" placeholder="Ej. Facebook, Gmail, Banco"
+                           autocomplete="off" autocapitalize="words" autocorrect="off" spellcheck="false">
                 </div>
                 <div class="input-group">
                     <label for="password-username">Usuario o Email</label>
-                    <input type="text" id="password-username" placeholder="Nombre de usuario o email">
+                    <input type="text" id="password-username" placeholder="Nombre de usuario o email"
+                           autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"
+                           inputmode="email">
                 </div>
                 <div class="input-group password-field">
                     <label for="password-value">Contraseña</label>
                     <div class="password-input-group">
-                        <input type="password" id="password-value" placeholder="Contraseña">
+                        <input type="password" id="password-value" placeholder="Contraseña"
+                               autocomplete="new-password" autocapitalize="none" autocorrect="off" spellcheck="false">
                         <button id="toggle-password" class="icon-button">
                             <i class="fas fa-eye"></i>
                         </button>
@@ -390,7 +422,9 @@
                 </div>
                 <div class="input-group">
                     <label for="password-url">URL (opcional)</label>
-                    <input type="text" id="password-url" placeholder="https://ejemplo.com">
+                    <input type="url" id="password-url" placeholder="https://ejemplo.com"
+                           autocomplete="url" autocapitalize="none" autocorrect="off" spellcheck="false"
+                           inputmode="url">
                 </div>
                 <div class="input-group">
                     <label for="password-category">Categoría</label>

@@ -48,6 +48,197 @@ let currentUser = null;
 let isFirebaseEnabled = false;
 let unsubscribePasswords = null;
 
+// Variables para WebAuthn/Face ID
+let biometricCredentialId = null;
+let isBiometricSupported = false;
+
+// Funciones de WebAuthn/Face ID
+function checkBiometricSupport() {
+    // Verificar si WebAuthn está disponible
+    if (!window.PublicKeyCredential) {
+        console.log('WebAuthn no está soportado en este navegador');
+        return false;
+    }
+
+    // Verificar si el dispositivo soporta autenticación biométrica
+    if (PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable) {
+        PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+            .then(available => {
+                isBiometricSupported = available;
+                updateBiometricUI();
+                console.log('Autenticación biométrica disponible:', available);
+            })
+            .catch(err => {
+                console.log('Error verificando soporte biométrico:', err);
+                isBiometricSupported = false;
+                updateBiometricUI();
+            });
+    }
+
+    return true;
+}
+
+function updateBiometricUI() {
+    const biometricButton = document.getElementById('biometric-button');
+    const faceIdToggle = document.getElementById('faceid-toggle');
+    
+    if (biometricButton) {
+        if (isBiometricSupported) {
+            biometricButton.style.display = 'block';
+            biometricButton.disabled = false;
+        } else {
+            biometricButton.style.display = 'none';
+            biometricButton.disabled = true;
+        }
+    }
+    
+    // Actualizar el toggle de Face ID en configuración
+    if (faceIdToggle && faceIdToggle.parentElement) {
+        if (isBiometricSupported) {
+            faceIdToggle.parentElement.style.display = 'flex';
+        } else {
+            faceIdToggle.parentElement.style.display = 'none';
+        }
+    }
+}
+
+function generateChallenge() {
+    const array = new Uint8Array(32);
+    crypto.getRandomValues(array);
+    return array;
+}
+
+function arrayBufferToBase64(buffer) {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+}
+
+function base64ToArrayBuffer(base64) {
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+    return bytes.buffer;
+}
+
+async function registerBiometric() {
+    if (!isBiometricSupported) {
+        showNotification('La autenticación biométrica no está disponible en este dispositivo', 'error');
+        return false;
+    }
+
+    try {
+        const challenge = generateChallenge();
+        const userId = new TextEncoder().encode('brune-security-user');
+
+        const publicKeyCredentialCreationOptions = {
+            challenge: challenge,
+            rp: {
+                name: "Brune Security",
+                id: window.location.hostname,
+            },
+            user: {
+                id: userId,
+                name: "usuario@brunesecurity.com",
+                displayName: "Usuario Brune Security",
+            },
+            pubKeyCredParams: [
+                {
+                    alg: -7, // ES256
+                    type: "public-key"
+                },
+                {
+                    alg: -257, // RS256
+                    type: "public-key"
+                }
+            ],
+            authenticatorSelection: {
+                authenticatorAttachment: "platform",
+                userVerification: "required"
+            },
+            timeout: 60000,
+            attestation: "direct"
+        };
+
+        const credential = await navigator.credentials.create({
+            publicKey: publicKeyCredentialCreationOptions
+        });
+
+        if (credential) {
+            // Guardar el ID de la credencial
+            biometricCredentialId = arrayBufferToBase64(credential.rawId);
+            localStorage.setItem('biometric_credential_id', biometricCredentialId);
+            localStorage.setItem('faceid_enabled', 'true');
+            
+            showNotification('Face ID configurado correctamente', 'success');
+            return true;
+        }
+    } catch (error) {
+        console.error('Error registrando biométrico:', error);
+        if (error.name === 'NotAllowedError') {
+            showNotification('Acceso denegado. Por favor, permite el uso de Face ID', 'error');
+        } else if (error.name === 'NotSupportedError') {
+            showNotification('Face ID no está disponible en este dispositivo', 'error');
+        } else {
+            showNotification('Error configurando Face ID: ' + error.message, 'error');
+        }
+        return false;
+    }
+}
+
+async function authenticateWithBiometric() {
+    if (!isBiometricSupported) {
+        showNotification('La autenticación biométrica no está disponible', 'error');
+        return false;
+    }
+
+    const savedCredentialId = localStorage.getItem('biometric_credential_id');
+    if (!savedCredentialId) {
+        showNotification('Face ID no está configurado. Configúralo primero en ajustes', 'error');
+        return false;
+    }
+
+    try {
+        const challenge = generateChallenge();
+        const credentialId = base64ToArrayBuffer(savedCredentialId);
+
+        const publicKeyCredentialRequestOptions = {
+            challenge: challenge,
+            allowCredentials: [{
+                id: credentialId,
+                type: 'public-key',
+                transports: ['internal']
+            }],
+            userVerification: 'required',
+            timeout: 60000
+        };
+
+        const assertion = await navigator.credentials.get({
+            publicKey: publicKeyCredentialRequestOptions
+        });
+
+        if (assertion) {
+            showNotification('Autenticación exitosa con Face ID', 'success');
+            return true;
+        }
+    } catch (error) {
+        console.error('Error en autenticación biométrica:', error);
+        if (error.name === 'NotAllowedError') {
+            showNotification('Autenticación cancelada o denegada', 'error');
+        } else if (error.name === 'InvalidStateError') {
+            showNotification('Face ID no está disponible. Verifica la configuración', 'error');
+        } else {
+            showNotification('Error en autenticación: ' + error.message, 'error');
+        }
+        return false;
+    }
+}
+
 // Verificar si Firebase está disponible
 function checkFirebaseAvailability() {
     return typeof window.firebase !== 'undefined' && 
@@ -135,9 +326,22 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
-    document.getElementById('faceid-toggle').addEventListener('change', function() {
-        localStorage.setItem('faceid_enabled', this.checked);
-        showNotification(this.checked ? 'FaceID habilitado' : 'FaceID deshabilitado');
+    document.getElementById('faceid-toggle').addEventListener('change', async function() {
+        if (this.checked) {
+            // Intentar registrar biométrico
+            const success = await registerBiometric();
+            if (!success) {
+                // Si falla el registro, desmarcar el toggle
+                this.checked = false;
+                localStorage.setItem('faceid_enabled', 'false');
+            }
+        } else {
+            // Deshabilitar Face ID
+            localStorage.setItem('faceid_enabled', 'false');
+            localStorage.removeItem('biometric_credential_id');
+            biometricCredentialId = null;
+            showNotification('Face ID deshabilitado', 'info');
+        }
     });
     
     // Event Listeners para login y registro
@@ -225,6 +429,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Funciones de inicialización
 function initApp() {
+    // Verificar soporte biométrico
+    checkBiometricSupport();
+    
+    // Cargar credencial biométrica guardada
+    const savedCredentialId = localStorage.getItem('biometric_credential_id');
+    if (savedCredentialId) {
+        biometricCredentialId = savedCredentialId;
+    }
+    
+    // Actualizar UI biométrica
+    updateBiometricUI();
+    
     // Inicializar Firebase
     setTimeout(() => {
         initFirebase();
@@ -232,6 +448,9 @@ function initApp() {
     
     // Cargar datos del usuario si existe
     loadUserData();
+    
+    // Cargar contraseñas guardadas del localStorage
+    loadPasswordsFromLocal();
     
     // Mostrar la pantalla de login al inicio
     showScreen('login');
@@ -309,19 +528,38 @@ function handleLogin() {
     }
 }
 
-function handleBiometricLogin() {
-    // Simular autenticación biométrica
+async function handleBiometricLogin() {
     const biometricButton = document.getElementById('biometric-button');
-    biometricButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    const originalHTML = biometricButton.innerHTML;
     
-    setTimeout(() => {
-        biometricButton.innerHTML = '<i class="fas fa-fingerprint"></i>';
-        showScreen('dashboard');
-        // Simular carga de datos
-        setTimeout(() => {
-            renderPasswordsList();
-        }, 300);
-    }, 1500);
+    // Mostrar spinner
+    biometricButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+    biometricButton.disabled = true;
+    
+    try {
+        const success = await authenticateWithBiometric();
+        
+        if (success) {
+            // Cargar datos del usuario
+            const userData = loadUserData();
+            if (userData) {
+                currentUser = userData;
+                showScreen('dashboard');
+                setTimeout(() => {
+                    renderPasswordsList();
+                }, 300);
+            } else {
+                showNotification('Error cargando datos del usuario', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Error en login biométrico:', error);
+        showNotification('Error en autenticación biométrica', 'error');
+    } finally {
+        // Restaurar botón
+        biometricButton.innerHTML = originalHTML;
+        biometricButton.disabled = false;
+    }
 }
 
 async function handleLogout() {
@@ -607,6 +845,7 @@ async function deletePassword(id) {
     if (confirm('¿Estás seguro de que quieres eliminar esta contraseña?')) {
         await deletePasswordFromFirebase(id);
         showNotification('Contraseña eliminada correctamente');
+        renderPasswordsList();
     }
 }
 
@@ -662,8 +901,9 @@ async function savePassword() {
         await savePasswordToFirebase(passwordData);
     }
     
-    // Volver al dashboard
+    // Volver al dashboard y actualizar la vista
     showScreen('dashboard');
+    renderPasswordsList();
 }
 
 function togglePasswordVisibility() {
@@ -1227,6 +1467,13 @@ function deletePasswordFromLocal(passwordId) {
     
     localStorage.setItem('passwords', JSON.stringify(filteredPasswords));
     passwords = filteredPasswords;
+}
+
+function loadPasswordsFromLocal() {
+    const localPasswords = JSON.parse(localStorage.getItem('passwords') || '[]');
+    if (localPasswords.length > 0) {
+        passwords = localPasswords;
+    }
 }
 
 // ========================================
