@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BruneSecurity - Gestor de Contraseñas</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Pantalla de Login -->
+        <div class="screen" id="login-screen">
+            <div class="login-container">
+                <div class="logo">
+                    <i class="fas fa-shield-halved"></i>
+                    <h1>BruneSecurity</h1>
+                </div>
+                <div class="login-form">
+                    <h2>Iniciar Sesión</h2>
+                    <div class="input-group">
+                        <label for="login-email">Correo Electrónico</label>
+                        <input type="email" id="login-email" placeholder="Ingresa tu correo electrónico">
+                    </div>
+                    <div class="input-group">
+                        <label for="master-password">Contraseña Maestra</label>
+                        <input type="password" id="master-password" placeholder="Ingresa tu contraseña maestra">
+                    </div>
+                    <button id="login-button" class="primary-button">Iniciar Sesión Local</button>
+                    <button id="login-firebase-button" class="secondary-button" style="margin-top: 10px;">
+                        <i class="fas fa-cloud"></i> Iniciar Sesión en la Nube
+                    </button>
+                    <div class="biometric-login">
+                        <button id="biometric-button" class="icon-button">
+                            <i class="fas fa-fingerprint"></i>
+                        </button>
+                        <span>Usar Biometría</span>
+                    </div>
+                    <div class="register-link">
+                        <p>¿No tienes cuenta? <a href="#" id="show-register">Regístrate aquí</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de Registro -->
+        <div class="screen hidden" id="register-screen">
+            <div class="login-container">
+                <div class="logo">
+                    <i class="fas fa-shield-halved"></i>
+                    <h1>BruneSecurity</h1>
+                </div>
+                <div class="login-form">
+                    <h2>Crear Cuenta</h2>
+                    <div class="input-group">
+                        <label for="register-email">Correo Electrónico</label>
+                        <input type="email" id="register-email" placeholder="Ingresa tu correo electrónico">
+                    </div>
+                    <div class="input-group">
+                        <label for="register-password">Contraseña Maestra</label>
+                        <input type="password" id="register-password" placeholder="Crea tu contraseña maestra">
+                    </div>
+                    <div class="input-group">
+                        <label for="confirm-password">Confirmar Contraseña</label>
+                        <input type="password" id="confirm-password" placeholder="Confirma tu contraseña maestra">
+                    </div>
+                    <button id="register-button" class="primary-button">Crear Cuenta Local</button>
+                    <button id="register-firebase-button" class="secondary-button" style="margin-top: 10px;">
+                        <i class="fas fa-cloud"></i> Crear Cuenta en la Nube
+                    </button>
+                    <div class="firebase-status" id="firebase-status" style="text-align: center; margin: 10px 0; font-size: 12px; color: #666;">
+                        Verificando conexión con la nube...
+                    </div>
+                    <div class="login-link">
+                        <p>¿Ya tienes cuenta? <a href="#" id="show-login">Inicia sesión aquí</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla Principal (Dashboard) -->
+        <div class="screen hidden" id="dashboard-screen">
+            <header class="app-header">
+                <div class="logo-small">
+                    <i class="fas fa-shield-halved"></i>
+                    <h2>BruneSecurity</h2>
+                </div>
+                <div class="user-info" id="user-info" style="display: none;">
+                    <span id="user-email" style="font-size: 12px; color: #666;"></span>
+                    <i class="fas fa-cloud" style="color: #10b981; margin-left: 5px;" title="Sincronizado en la nube"></i>
+                </div>
+                <div class="search-bar">
+                    <i class="fas fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" placeholder="Buscar contraseñas...">
+                </div>
+                <button id="logout-button" class="icon-button">
+                    <i class="fas fa-arrow-right-from-bracket"></i>
+                </button>
+            </header>
+            
+            <!-- Botón flotante para añadir nueva contraseña (oculto) -->
+            <button id="add-new-password-btn" class="floating-action-button" style="display: none;">
+                <i class="fas fa-plus"></i>
+            </button>
+
+            <!-- Categorías ocultas -->
+            <div class="categories-container" style="display: none;">
+                <div class="categories-header">
+                    <h3>Categorías</h3>
+                    <button id="add-category-button" class="icon-button">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div class="categories-list">
+                    <button class="category-button active" data-category="all">
+                        <i class="fas fa-grip"></i>
+                        <span>Todas</span>
+                    </button>
+                    <button class="category-button" data-category="social">
+                        <i class="fas fa-user-group"></i>
+                        <span>Redes Sociales</span>
+                    </button>
+                    <button class="category-button" data-category="work">
+                        <i class="fas fa-building"></i>
+                        <span>Trabajo</span>
+                    </button>
+                    <button class="category-button" data-category="banking">
+                        <i class="fas fa-landmark"></i>
+                        <span>Bancario</span>
+                    </button>
+                    <button class="category-button" data-category="shopping">
+                        <i class="fas fa-cart-shopping"></i>
+                        <span>Compras</span>
+                    </button>
+                    <button class="category-button add-new-category" id="add-new-category-btn">
+                        <i class="fas fa-circle-plus"></i>
+                        <span>Nueva Categoría</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="passwords-container">
+                <div class="passwords-header">
+                    <h3>Mis Contraseñas</h3>
+                    <div class="sort-filter">
+                        <button id="sort-button" class="icon-button">
+                            <i class="fas fa-sort"></i>
+                        </button>
+                        <button id="filter-button" class="icon-button">
+                            <i class="fas fa-filter"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="passwords-list" id="passwords-list">
+                    <!-- Las contraseñas se cargarán dinámicamente aquí -->
+                </div>
+            </div>
+
+            <div class="add-password-fab">
+                <button id="add-password-button" class="fab-button">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+
+            <nav class="bottom-nav">
+                <button class="nav-button active" data-screen="main">
+                    <i class="fas fa-house"></i>
+                    <span>Inicio</span>
+                </button>
+                <button class="nav-button" data-screen="generator">
+                    <i class="fas fa-key"></i>
+                    <span>Generar</span>
+                </button>
+                <button class="nav-button" data-screen="add-password">
+                    <i class="fas fa-circle-plus"></i>
+                    <span>Agregar</span>
+                </button>
+                <button class="nav-button" data-screen="settings">
+                    <i class="fas fa-gear"></i>
+                    <span>Ajustes</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Pantalla de Ajustes -->
+        <div class="screen hidden" id="settings-screen">
+            <header class="app-header">
+                <div class="logo-small">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2>BruneSecurity</h2>
+                </div>
+                <h3>Ajustes</h3>
+                <button id="settings-back-button" class="icon-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </header>
+
+            <div class="settings-container">
+                <div class="settings-group">
+                    <h3>Seguridad</h3>
+                    <div class="settings-item">
+                        <span>Cambiar Contraseña Maestra</span>
+                        <button id="change-password-btn" class="secondary-button">Cambiar</button>
+                    </div>
+                    <div class="settings-item">
+                        <span>Habilitar FaceID</span>
+                        <label class="switch">
+                            <input type="checkbox" id="faceid-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="bottom-nav">
+                <button class="nav-button" data-screen="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </button>
+                <button class="nav-button" data-screen="generator">
+                    <i class="fas fa-key"></i>
+                    <span>Generador</span>
+                </button>
+                <button class="nav-button active" data-screen="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Ajustes</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Pantalla de Ajustes -->
+        <div class="screen hidden" id="settings-screen">
+            <header class="app-header">
+                <div class="logo-small">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2>BruneSecurity</h2>
+                </div>
+                <h3>Ajustes</h3>
+                <button id="settings-back-button" class="icon-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </header>
+            
+            <div class="settings-container">
+                <div class="settings-group">
+                    <h3>Seguridad</h3>
+                    <div class="settings-item">
+                        <span>Cambiar Contraseña Maestra</span>
+                        <button id="change-password-btn" class="secondary-button">Cambiar</button>
+                    </div>
+                    <div class="settings-item">
+                        <span>Habilitar FaceID</span>
+                        <label class="switch">
+                            <input type="checkbox" id="faceid-toggle">
+                            <span class="slider round"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="bottom-nav">
+                <button class="nav-button" data-screen="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Inicio</span>
+                </button>
+                <button class="nav-button" data-screen="generator">
+                    <i class="fas fa-key"></i>
+                    <span>Generador</span>
+                </button>
+                <button class="nav-button active" data-screen="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Ajustes</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Pantalla de Generador de Contraseñas -->
+        <div class="screen hidden" id="generator-screen">
+            <header class="app-header">
+                <div class="logo-small">
+                    <i class="fas fa-shield-halved"></i>
+                    <h2>BruneSecurity</h2>
+                </div>
+                <h3>Generador de Contraseñas</h3>
+                <button id="generator-back-button" class="icon-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </header>
+
+            <div class="generator-container">
+                <div class="generated-password">
+                    <input type="text" id="generated-password" readonly>
+                    <button id="copy-password" class="icon-button">
+                        <i class="fas fa-clipboard"></i>
+                    </button>
+                    <button id="refresh-password" class="icon-button">
+                        <i class="fas fa-arrows-rotate"></i>
+                    </button>
+                </div>
+
+                <div class="generator-options">
+                    <div class="option-group">
+                        <label for="password-length">Longitud de la contraseña</label>
+                        <div class="length-display" id="length-value">12 caracteres</div>
+                        <input type="range" id="password-length" min="8" max="32" value="12">
+                    </div>
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="include-uppercase" checked>
+                            <span>Incluir mayúsculas (A-Z)</span>
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="include-lowercase" checked>
+                            <span>Incluir minúsculas (a-z)</span>
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="include-numbers" checked>
+                            <span>Incluir números (0-9)</span>
+                        </label>
+                    </div>
+                    <div class="option-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="include-symbols" checked>
+                            <span>Incluir símbolos (!@#$%^&*)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button id="generate-password" class="primary-button">Generar Contraseña</button>
+                <button id="save-generated-password" class="secondary-button">Guardar Esta Contraseña</button>
+            </div>
+
+            <nav class="bottom-nav">
+                <button class="nav-button" data-screen="main">
+                    <i class="fas fa-house"></i>
+                    <span>Inicio</span>
+                </button>
+                <button class="nav-button active" data-screen="generator">
+                    <i class="fas fa-key"></i>
+                    <span>Generar</span>
+                </button>
+                <button class="nav-button" data-screen="settings">
+                    <i class="fas fa-gear"></i>
+                    <span>Ajustes</span>
+                </button>
+            </nav>
+        </div>
+
+        <!-- Pantalla de Añadir/Editar Contraseña -->
+        <div class="screen hidden" id="add-password-screen">
+            <header class="app-header">
+                <div class="logo-small">
+                    <i class="fas fa-shield-alt"></i>
+                    <h2>BruneSecurity</h2>
+                </div>
+                <h3 id="add-edit-title">Añadir Contraseña</h3>
+                <button id="add-password-back-button" class="icon-button">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+            </header>
+
+            <div class="add-password-form">
+                <div class="input-group">
+                    <label for="password-title">Título</label>
+                    <input type="text" id="password-title" placeholder="Ej. Facebook, Gmail, Banco">
+                </div>
+                <div class="input-group">
+                    <label for="password-username">Usuario o Email</label>
+                    <input type="text" id="password-username" placeholder="Nombre de usuario o email">
+                </div>
+                <div class="input-group password-field">
+                    <label for="password-value">Contraseña</label>
+                    <div class="password-input-group">
+                        <input type="password" id="password-value" placeholder="Contraseña">
+                        <button id="toggle-password" class="icon-button">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button id="generate-inline" class="icon-button">
+                            <i class="fas fa-key"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength-indicator">
+                        <div class="strength-bar" id="strength-bar"></div>
+                        <div class="strength-text" id="strength-text">Fortaleza: No evaluada</div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="password-url">URL (opcional)</label>
+                    <input type="text" id="password-url" placeholder="https://ejemplo.com">
+                </div>
+                <div class="input-group">
+                    <label for="password-category">Categoría</label>
+                    <div class="category-select-container">
+                        <select id="password-category">
+                            <option value="social">Redes Sociales</option>
+                            <option value="work">Trabajo</option>
+                            <option value="banking">Bancario</option>
+                            <option value="shopping">Compras</option>
+                        </select>
+                        <button id="add-category-from-password" class="icon-button">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label for="password-notes">Notas (opcional)</label>
+                    <textarea id="password-notes" placeholder="Notas adicionales..."></textarea>
+                </div>
+
+                <button id="save-password" class="primary-button">Guardar</button>
+                <button id="cancel-password" class="secondary-button">Cancelar</button>
+            </div>
+        </div>
+
+        <!-- Modal para Añadir Categoría -->
+        <div class="modal" id="add-category-modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Añadir Categoría</h3>
+                    <button id="close-category-modal" class="icon-button">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="input-group">
+                        <label for="category-name">Nombre de la Categoría</label>
+                        <input type="text" id="category-name" placeholder="Ej. Personal, Educación">
+                    </div>
+                    <div class="input-group">
+                        <label for="category-icon">Icono</label>
+                        <select id="category-icon">
+                            <option value="fas fa-user">Personal</option>
+                            <option value="fas fa-graduation-cap">Educación</option>
+                            <option value="fas fa-gamepad">Juegos</option>
+                            <option value="fas fa-envelope">Email</option>
+                            <option value="fas fa-credit-card">Tarjetas</option>
+                            <option value="fas fa-wifi">WiFi</option>
+                        </select>
+                    </div>
+                    <button id="save-category" class="primary-button">Guardar Categoría</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration (PLACEHOLDER - Usuario debe reemplazar con su configuración)
+        const firebaseConfig = {
+            apiKey: "TU_API_KEY",
+            authDomain: "TU_PROJECT_ID.firebaseapp.com",
+            projectId: "TU_PROJECT_ID",
+            storageBucket: "TU_PROJECT_ID.appspot.com",
+            messagingSenderId: "TU_SENDER_ID",
+            appId: "TU_APP_ID"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Make Firebase available globally
+        window.firebase = {
+            auth,
+            db,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            signOut,
+            collection,
+            addDoc,
+            getDocs,
+            doc,
+            updateDoc,
+            deleteDoc,
+            query,
+            where,
+            onSnapshot
+        };
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
