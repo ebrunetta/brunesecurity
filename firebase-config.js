@@ -11,14 +11,27 @@
 // 6. Copia la configuración que aparece y reemplaza los valores abajo
 
 // CONFIGURACIÓN DE FIREBASE (REEMPLAZAR CON TUS DATOS)
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "TU_API_KEY_AQUI",
-    authDomain: "TU_PROJECT_ID.firebaseapp.com",
-    projectId: "TU_PROJECT_ID",
-    storageBucket: "TU_PROJECT_ID.appspot.com",
-    messagingSenderId: "TU_SENDER_ID",
-    appId: "TU_APP_ID"
+  apiKey: "AIzaSyDdy3wyzNhjWRO_iFM-8R7IcsCUiUFGm2M",
+  authDomain: "brune-security-58047.firebaseapp.com",
+  projectId: "brune-security-58047",
+  storageBucket: "brune-security-58047.firebasestorage.app",
+  messagingSenderId: "852380643783",
+  appId: "1:852380643783:web:991375f938972b8ab429e2",
+  measurementId: "G-L3YPSNSFY4"
 };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 
 // Hacer la configuración disponible globalmente
 window.firebaseConfig = firebaseConfig;
